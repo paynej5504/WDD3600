@@ -1,5 +1,5 @@
 # WDD3600
-This website was created using the tutorial from "Node.js - The Complete Guide" by Maximilian Schwarzmuller.
+This code is currently the beginning stages of a website that is created using the tutorial from "Node.js - The Complete Guide" by Maximilian Schwarzmuller.
 This website is still in progress and is not yet complete.
 
 ## Before download
