@@ -171,11 +171,6 @@ form {
   width: 100%;
 }
 
-img {
-  height: 100%;
-  width: 100%;
-}
-
 .card__actions {
     padding: 1rem;
     text-align: center;
@@ -202,6 +197,11 @@ img {
 .btn:active {
   background-color: rgb(12, 136, 145);
   color: white;
+}
+
+img {
+  height: 100%;
+  width: 100%;
 }
 
 
