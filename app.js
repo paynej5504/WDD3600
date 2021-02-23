@@ -12,7 +12,13 @@ const bodyParser = require('body-parser');
 const errorController = require('./controllers/error');
 
 //import database
-const db = require('./util/database');
+const sequelize = require('./util/database');
+const Product = require('./models/product');
+const User = require ('./models/user');
+const Cart = require('./models/cart');
+const CartItem = require('./models/cart-item');
+const Order = require('./models/order');
+const OrderItem = require('./models/order-item');
 
 /*imports modules */
 const app = express();
@@ -29,6 +35,15 @@ app.use(bodyParser.urlencoded({extended: false}));
 //static method serves static files. In this case it's used to access the css file
 app.use(express.static(path.join(__dirname, 'public', )));
 
+app.use ((req, res, next) => {
+    User.findByPk(1)
+    .then(user => {
+        req.user = user;
+        next();
+    })
+    .catch(err => console.log(err));
+});
+
 //places the router object 
 app.use('/admin',adminRoutes); //ADDED BY AH
 app.use(shopRoutes);
@@ -42,5 +57,40 @@ app.use(shopRoutes);
 //references get404 function
 app.use(errorController.get404);
 
-// what port the server listens on. (localhost:3000)
-app.listen(3000);
+Product.belongsTo(User, {constraints: true, onDelete: 'CASCADE'});
+User.hasMany(Product);
+User.hasOne(Cart);
+Cart.belongsTo(User);
+Cart.belongsToMany(Product, { through: CartItem });
+Product.belongsToMany(Cart, { through: CartItem });
+Order.belongsTo(User);
+User.hasMany(Order);
+Order.belongsToMany(Product, { through: OrderItem });
+
+
+sequelize
+//.sync({force: true})
+.sync()
+.then(result => {
+    return User.findByPk(1);
+    //console.log(result);
+    // what port the server listens on. (localhost:3000)
+    //app.listen(3000);
+})
+.then (user => {
+    if (!user) {
+       return User.create({name: 'Max', email: 'test@test.com'});
+    }
+    return user; 
+})
+.then (user => {
+    return user.createCart();
+    //console.log(user);
+})
+.then (cart => {
+    app.listen(3000);
+})
+.catch(err => {
+    console.log(err);
+});
+
