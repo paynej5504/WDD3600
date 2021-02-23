@@ -3,7 +3,7 @@ This code is currently the beginning stages of a website that is created using t
 This website is still in progress and is not yet complete.
 
 ## Before download
-This website uses Node.js, Express, JavaScript, HTML, and CSS. Before you download the files make sure you have Node.js and Express downloaded.
+This website uses Node.js, Express, JavaScript, HTML, and CSS, and sequelize. Before you download the files make sure you have Node.js and Express downloaded.
 You can get the latest version of Node.js here: https://nodejs.org/en/download/ .
  You can install Express by opening GitBash ( which you can download here https://git-scm.com/ ) and type ```npm install express``` then press enter.
  This website also uses the templating language ejs. Make sure you install that before running.
