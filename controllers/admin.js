@@ -22,21 +22,21 @@ exports.getAddProduct = (req, res, next) => {
     
     //creates a new product based on the class
     //passes title, price, image, and description of product
-    const product = new Product(
-      title, 
-      price, 
-      description, 
-      imageUrl, 
-      null, 
-      req.user._id
-      );
+    const product = new Product({
+      title: title, 
+      price: price, 
+      description: description, 
+      imageUrl: imageUrl,
+      userId: req.user
+    });
     product
     .save()
     .then(result => {
       //console.log(result);
       console.log('created product');
       res.redirect('/admin/products');
-    }).catch(err => {
+    })
+    .catch(err => {
       console.log(err);
     });
     
@@ -73,24 +73,29 @@ exports.getAddProduct = (req, res, next) => {
     const updatedImageUrl = req.body.imageUrl;
     const updatedDescription = req.body.description;
     
-      const product = new Product(
-        updatedTitle, 
-        updatedPrice, 
-        updatedDescription,
-        updatedImageUrl, 
-        prodId
-        );
-    product
-    .save()
-    .then(result => {
-      console.log('UPDATED PRODUCT');
-      res.redirect('/admin/products');
-    })
-    .catch(err => console.log(err));
-  }
+    //find product and get full mongoose object
+    Product.findById(prodId)
+      .then(product => {
+        product.title = updatedTitle;
+        product.price = updatedPrice;
+        product.description = updatedDescription;
+        product.imageUrl = updatedImageUrl;
+        return product.save()
+      })
+      .then(result => {
+        console.log('UPDATED PRODUCT');
+        res.redirect('/admin/products');
+      })
+      .catch(err => console.log(err));
+    }
 
+    //get products
   exports.getProducts = (req, res, next) => {
-    Product.fetchAll()
+    Product.find()
+    // //which fields you want to select or unselect
+    // .select('title price -_id')
+    // //tells mongoose to populate a certain field with info
+    // .populate('userId', 'name')
     .then(products => {
       res.render('admin/products', {
         prods: products,
@@ -104,7 +109,7 @@ exports.getAddProduct = (req, res, next) => {
   //delete product
   exports.postDeleteProduct = (req, res, next) => {
     const prodId = req.body.productId;
-    Product.deleteById(prodId)
+    Product.findByIdAndRemove(prodId)
     .then(() => {
       console.log('DESTROYED PRODUCT');
       //redirect to products page once product is deleted

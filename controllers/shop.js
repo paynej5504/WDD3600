@@ -2,8 +2,10 @@ const Product = require('../models/product');
 const Order = require('../models/order');
 // for /products url
 exports.getProducts = (req, res, next) => {
-  Product.fetchAll()
+  //find all the products
+  Product.find()
   .then(products => {
+    console.log(products);
     res.render('shop/product-list', {
       prods: products,
       pageTitle: 'All Products',
@@ -32,8 +34,8 @@ exports.getProduct = (req, res, next) => {
 };
 
 exports.getIndex = (req, res, next) => {
-  //call all the products
-  Product.fetchAll()
+  //find all the products
+  Product.find()
   .then(products => {
     res.render('shop/index', {
       prods: products,
@@ -50,8 +52,11 @@ exports.getIndex = (req, res, next) => {
 exports.getCart = (req, res, next) => {
   //console.log(req.user.cart);
   req.user
-  .getCart()
-  .then(products => {
+  //tell mongoose to fetch data for cart items
+  .populate('cart.items.productId')
+  .execPopulate()
+  .then(user => {
+     const products = user.cart.items;
       res.render('shop/cart', {
         path: '/cart',
         pageTitle: 'Your Cart',
@@ -65,7 +70,8 @@ exports.getCart = (req, res, next) => {
 exports.postCart = (req, res, next) => {
   const prodId = req.body.productId;
   //fetch product you want to add
-  Product.findById(prodId).then(product => {
+  Product.findById(prodId)
+  .then(product => {
     return req.user.addToCart(product); //return promise
   })
   //result of update operation
@@ -79,7 +85,7 @@ exports.postCart = (req, res, next) => {
 exports.postCartDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
   req.user
-  .deleteItemFromCart(prodId)
+  .removeFromCart(prodId)
   .then(result => {
     res.redirect('/cart');
   })
@@ -87,10 +93,29 @@ exports.postCartDeleteProduct = (req, res, next) => {
 };
 
 exports.postOrder = (req, res, next) => {
-  let fetchedCart;
   req.user
-  .addOrder()
+    .populate('cart.items.productId')
+    .execPopulate()
+    .then(user => {
+      const products = user.cart.items.map(i => {
+        //._doc gives access to just the data
+        return {quantity: i.quantity, product: {...i.productId._doc}};
+      });
+      //create new order object
+      const order = new Order({
+        user: {
+          name: req.user.name,
+          userId: req.user
+        },
+        //products for user's cart
+        products: products
+      });
+      return order.save();
+    })
   .then(result => {
+    req.user.clearCart();
+  })
+  .then(() => {
     res.redirect('/orders');
   })
   .catch(err => console.log(err));
@@ -98,8 +123,7 @@ exports.postOrder = (req, res, next) => {
 
 //view for /orders url
 exports.getOrders = (req, res, next) => {
-  req.user
-  .getOrders()
+  Order.find({'user.userId': req.user._id})
   .then(orders => {
     res.render('shop/orders', {
       path: '/orders',

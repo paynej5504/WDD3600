@@ -1,20 +1,29 @@
-//import sequelize
-const Sequelize = require('sequelize');
-const sequelize = require('../util/database');
+const mongoose = require('mongoose');
 
-// const Order = sequelize.define('order', {
-//     //create id by setting type, nulls, if it will auto increment, and if it is a primary key
-//     id: {
-//         type: Sequelize.INTEGER,
-//         //will auto increment
-//         autoIncrement: true,
-//         //will not allow a null
-//         allowNull: false,
-//         // this is th eprimary key
-//         primaryKey: true
-//     }
- 
-// });
+const Schema = mongoose.Schema;
 
-//export cartItem
-//module.exports = Order;
+//store data in order collection
+const orderSchema = new Schema ({
+    //product data
+    products: [
+        {
+            product: { type: Object, required: true},
+            quantity: {type: Number, required: true}
+        }
+    ],
+    //user info
+    user: { 
+        name: {
+            type: String,
+            required: true
+        },
+        userId: {
+            type: Schema.Types.ObjectId, //user id
+            required: true,
+            ref: 'User' //refer to user model
+        }
+    }
+});
+
+//export order model
+module.exports = mongoose.model('Order', orderSchema);

@@ -7,10 +7,11 @@ const path = require('path');
 
 const express = require('express');
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
 
 //imports error.js from controllers folder
 const errorController = require('./controllers/error');
-const mongoConnect = require('./util/database').mongoConnect;
+
 const User = require('./models/user');
 
 /*imports modules */
@@ -36,7 +37,7 @@ app.use((req, res, next) => {
     //search for user with this id
     User.findById('6037f3f60d88f74b980b648b')
       .then(user => {
-        req.user = new User(user.name, user.email, user.cart, user._id);
+        req.user = user;
         next();
       })
       .catch(err => console.log(err));
@@ -55,6 +56,26 @@ app.use(shopRoutes);
 //references get404 function
 app.use(errorController.get404);
 
-mongoConnect(() => {
-    app.listen(3000);
+//connect via mongoose
+mongoose.connect('mongodb+srv://Jeris:VWmtMnAk2SRMlaaS@cluster0.riltt.mongodb.net/shop?retryWrites=true&w=majority')
+.then(result =>{
+  //see if have user
+  User.findOne().then(user => {
+    //if user is not set
+    if (!user) {
+      //create new user 
+      const user = new User({
+        name: 'Max',
+        email: 'max@test.com',
+        cart: {
+          items: []
+        }
+      }); 
+      user.save();
+    }
+  })
+  
+  app.listen(3000);
+}).catch(err => {
+  console.log(err);
 });
