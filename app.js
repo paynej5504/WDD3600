@@ -57,7 +57,7 @@ app.use(shopRoutes);
 app.use(errorController.get404);
 
 //connect via mongoose
-mongoose.connect('mongodb+srv://Jeris:VWmtMnAk2SRMlaaS@cluster0.riltt.mongodb.net/shop?retryWrites=true&w=majority')
+mongoose.connect('mongodb+srv://Jeris:meeko05@cluster0.riltt.mongodb.net/shop?retryWrites=true&w=majority')
 .then(result =>{
   //see if have user
   User.findOne().then(user => {
