@@ -7,7 +7,7 @@ This website uses Node.js, Express, JavaScript, HTML, and CSS, and sequelize. Be
 You can get the latest version of Node.js here: https://nodejs.org/en/download/ .
  You can install Express by opening GitBash ( which you can download here https://git-scm.com/ ) and type ```npm install express``` then press enter.
  This website also uses the templating language ejs. Make sure you install that before running.
- You will also need to connect the code to a database. In this code I use MySQL, however, feel free to use the database of your choice. Code for the database can be found in "util/database.js" make sure to alter the code in order to connect to your database.
+ You will also need to connect the code to a database. In this code I use MongoDB, however, feel free to use the database of your choice. Code for the database can be found in "util/database.js" make sure to alter the code in order to connect to your database.
 
 ## To download
 To download these files click on the green "Code" button and click "download ZIP". Once the files are done downloading, unzip them and begin using.
