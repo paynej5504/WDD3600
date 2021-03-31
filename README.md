@@ -13,4 +13,4 @@ You can get the latest version of Node.js here: https://nodejs.org/en/download/ 
 To download these files click on the green "Code" button and click "download ZIP". Once the files are done downloading, unzip them and begin using.
 
 ## To use
-To use the files, open GitBash in the main folder of the downloaded files and in GitBash type ```npm start```. The app will then open in the browser on localhost:3000.
+To use the files, open GitBash in the main folder of the downloaded files and in GitBash type ```npm install``` to download node_modules. Once those are downloaded type ```npm start```. The app will then open in the browser on localhost:3000.
