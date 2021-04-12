@@ -6,11 +6,12 @@ const Product = require('../models/product');
 //admin functions
 //exported function
 exports.getAddProduct = (req, res, next) => {
+
+    // if user is logged in show page
     res.render('admin/edit-product', {
       pageTitle: 'Add Product',
       path: '/admin/add-product',
-      editing: false,
-      isAuthenticated: req.session.isLoggedIn
+      editing: false
     });
   };
   
@@ -60,8 +61,7 @@ exports.getAddProduct = (req, res, next) => {
         pageTitle: 'Edit Product',
         path: '/admin/edit-product',
         editing: editMode,
-        product: product,
-        isAuthenticated: req.session.isLoggedIn
+        product: product
       });
     })
     .catch(err => console.log(err));
@@ -78,22 +78,26 @@ exports.getAddProduct = (req, res, next) => {
     //find product and get full mongoose object
     Product.findById(prodId)
       .then(product => {
+        if (product.userId.toString() !== req.user._id.toString()) {
+          return res.redirect('/');
+        }
         product.title = updatedTitle;
         product.price = updatedPrice;
         product.description = updatedDescription;
         product.imageUrl = updatedImageUrl;
-        return product.save()
+        return product.save().then(result => {
+          console.log('UPDATED PRODUCT');
+          res.redirect('/admin/products');
+        });
       })
-      .then(result => {
-        console.log('UPDATED PRODUCT');
-        res.redirect('/admin/products');
-      })
+      
       .catch(err => console.log(err));
     }
 
     //get products
   exports.getProducts = (req, res, next) => {
-    Product.find()
+    // only products created by user will be retrieved
+    Product.find({userId: req.user._id})
     // //which fields you want to select or unselect
     // .select('title price -_id')
     // //tells mongoose to populate a certain field with info
@@ -102,8 +106,7 @@ exports.getAddProduct = (req, res, next) => {
       res.render('admin/products', {
         prods: products,
         pageTitle: 'Admin Products',
-        path: '/admin/products',
-        isAuthenticated: req.session.isLoggedIn
+        path: '/admin/products'
       });
     })
     .catch(err => console.log(err));
@@ -112,7 +115,7 @@ exports.getAddProduct = (req, res, next) => {
   //delete product
   exports.postDeleteProduct = (req, res, next) => {
     const prodId = req.body.productId;
-    Product.findByIdAndRemove(prodId)
+    Product.deleteOne({_id: prodId, userId: req.user._id})
     .then(() => {
       console.log('DESTROYED PRODUCT');
       //redirect to products page once product is deleted
