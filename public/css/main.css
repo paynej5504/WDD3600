@@ -43,7 +43,7 @@ form {
 .main-header__nav {
   height: 100%;
   width: 100%;
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: space-between;
 }
@@ -70,14 +70,11 @@ form {
   cursor: pointer;
 }
 
-.main-header__item a {
-  text-decoration: none;
-  color: white;
-}
-
 .main-header__item a:hover,
 .main-header__item a:active,
-.main-header__item a.active {
+.main-header__item a.active,
+.main-header__item button:hover,
+.main-header__item button:active {
   color: rgb(37, 236, 186);
 }
 
@@ -112,16 +109,23 @@ form {
   padding: 0;
 }
 
-.mobile-nav__item a {
+.mobile-nav__item a,
+.mobile-nav__item button {
+  font: inherit;
   text-decoration: none;
   color: black;
   font-size: 1.5rem;
   padding: 0.5rem 2rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
 }
 
 .mobile-nav__item a:active,
 .mobile-nav__item a:hover,
-.mobile-nav__item a.active {
+.mobile-nav__item a.active,
+.mobile-nav__item button:hover,
+.mobile-nav__item button:active {
   background: #00695c;
   color: white;
   border-radius: 3px;
@@ -192,13 +196,13 @@ form {
 }
 
 .card__actions {
-    padding: 1rem;
-    text-align: center;
+  padding: 1rem;
+  text-align: center;
 }
 
 .card__actions button,
 .card__actions a {
-    margin: 0 0.25rem;
+  margin: 0 0.25rem;
 }
 
 .btn {
@@ -215,7 +219,7 @@ form {
 
 .btn:hover,
 .btn:active {
-  background-color: rgb(12, 136, 145);
+  background-color: #00695c;
   color: white;
 }
 
@@ -224,20 +228,30 @@ img {
   width: 100%;
 }
 
+.btn.danger {
+  color: red;
+  border-color: red;
+}
+
+.btn.danger:hover,
+.btn.danger:active {
+  background: red;
+  color: white;
+}
+
 .user-message {
   margin: auto;
   width: 90%;
   border: 1px solid rgb(90, 90, 214);
-  padding: .5rem;
+  padding: 0.5rem;
   border-radius: 3px;
   background: blanchedalmond;
   text-align: center;
-
 }
 
 .user-message--error {
   border-color: red;
-  background: rgb(243, 189, 189);
+  background: rgb(255, 176, 176);
   color: red;
 }
 
