@@ -3,6 +3,7 @@ const path = require('path');
 
 /*import express*/
 const express = require('express');
+const { body } = require('express-validator/check');
 
 //import products.js from controllers folder
 const adminController = require('../controllers/admin');
@@ -19,11 +20,51 @@ const router = express.Router();
  router.get('/products', isAuth, adminController.getProducts);
 
 // // /admin/add-product => POST
- router.post('/add-product', isAuth, adminController.postAddProduct);
+ router.post('/add-product', [
+    body ('title')
+    // only uses numbers and letters
+        .isString()
+        // title can't have less than 3 characters
+        .isLength({ min: 3 })
+        // trim extra whitespace
+        .trim(),
+    body ('imageUrl')
+        .isURL(), // check if valid URL
+    body ('price')
+        .isFloat(),
+    body ('description')
+        // description can't have less than 5 characters or more than 400
+        .isLength({ min: 5, max: 400 })
+        // trim extra whitespace
+        .trim()
+ ], 
+ isAuth, 
+ adminController.postAddProduct
+ );
 
 router.get('/edit-product/:productId', isAuth, adminController.getEditProduct);
 
-router.post('/edit-product', isAuth, adminController.postEditProduct);
+router.post('/edit-product', [
+    body ('title')
+        // check if valid string
+            .isString()
+            // title can't have less than 3 characters
+            .isLength({ min: 3 })
+            // trim extra whitespace
+            .trim(),
+        body ('imageUrl')
+            .isURL(), // check if valid URL
+        body ('price')
+            .isFloat(),
+        body ('description')
+            // description can't have less than 5 characters or more than 400
+            .isLength({ min: 5, max: 400 })
+            // trim extra whitespace
+            .trim()
+    ], 
+    isAuth, 
+    adminController.postEditProduct
+);
 
 router.post('/delete-product', isAuth, adminController.postDeleteProduct);
 

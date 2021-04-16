@@ -1,3 +1,4 @@
+const { validationResult } = require('express-validator/check');
 //const mongodb = require('mongodb'); //import mongo db
 const Product = require('../models/product');
 
@@ -11,7 +12,10 @@ exports.getAddProduct = (req, res, next) => {
     res.render('admin/edit-product', {
       pageTitle: 'Add Product',
       path: '/admin/add-product',
-      editing: false
+      editing: false,
+      hasError: false,
+      errorMessage: null,
+      validationErrors: []
     });
   };
   
@@ -21,6 +25,26 @@ exports.getAddProduct = (req, res, next) => {
     const imageUrl = req.body.imageUrl;
     const price = req.body.price;
     const description = req.body.description;
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      // error status code
+      return res.status(422).render('admin/edit-product', {
+        pageTitle: 'Add Product',
+        path: '/admin/edit-product',
+        editing: false,
+        hasError: true,
+        product: {
+          title: title,
+          imageUrl: imageUrl,
+          price: price,
+          description: description
+        },
+        // get error messages
+        errorMessage: errors.array()[0].msg,
+        validationErrors: errors.array()
+      });
+    }
     
     //creates a new product based on the class
     //passes title, price, image, and description of product
@@ -61,7 +85,10 @@ exports.getAddProduct = (req, res, next) => {
         pageTitle: 'Edit Product',
         path: '/admin/edit-product',
         editing: editMode,
-        product: product
+        product: product,
+        hasError: false,
+        errorMessage: null,
+        validationErrors: [] // no errors so empty array
       });
     })
     .catch(err => console.log(err));
@@ -74,6 +101,28 @@ exports.getAddProduct = (req, res, next) => {
     const updatedPrice = req.body.price;
     const updatedImageUrl = req.body.imageUrl;
     const updatedDescription = req.body.description;
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      // error status code
+      return res.status(422).render('admin/edit-product', {
+        pageTitle: 'Edit Product',
+        path: '/admin/edit-product',
+        editing: true,
+        hasError: true,
+        // product data values
+        product: {
+          title: updatedTitle,
+          imageUrl: updatedImageUrl,
+          price: updatedPrice,
+          description: updatedDescription,
+          _id: prodId
+        },
+        // get error messages
+        errorMessage: errors.array()[0].msg,
+        validationErrors: errors.array()
+      });
+    }
     
     //find product and get full mongoose object
     Product.findById(prodId)

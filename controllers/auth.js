@@ -3,6 +3,8 @@ const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const sendgridTransport = require('nodemailer-sendgrid-transport');
+// validationResult allows you to gather all the errors
+const { validationResult } = require('express-validator/check');
 
 const User = require('../models/user');
 
@@ -10,9 +12,9 @@ const User = require('../models/user');
 const transporter = nodemailer.createTransport(
   sendgridTransport({
     auth: {
-      // key from sendgrid encoded to protect account
+      // key from sendgrid
       api_key:
-        'SG.#######-##-###########.####_######################_###############'
+        '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'
     }
   })
 );
@@ -29,7 +31,12 @@ exports.getLogin = (req, res, next) => {
     path: '/login',
     pageTitle: 'Login',
     // pass error message
-    errorMessage: message
+    errorMessage: message,
+    oldInput: {
+      email: "",
+      password: ""
+    },
+    validationErrors: []
   });
 };
 
@@ -45,7 +52,13 @@ exports.getSignup = (req, res, next) => {
   res.render('auth/signup', {
     path: '/signup',
     pageTitle: 'Signup',
-    errorMessage: message
+    errorMessage: message,
+    oldInput: {
+      email: "",
+      password: "",
+      confirmPassword: ""
+    },
+    validationErrors: []
   });
 };
 
@@ -53,13 +66,46 @@ exports.postLogin = (req, res, next) => {
   // extract email and password
   const email = req.body.email;
   const password = req.body.password;
+
+  const errors = validationResult(req); // collect errors
+  // if there are errors
+  if (!errors.isEmpty()) {
+    console.log(errors.array());
+    // return error status code
+    return res.status(422)
+    // return to login page and log any errors
+    .render('auth/login', {
+      path: '/login',
+      pageTitle: 'Login',
+      errorMessage: errors.array()[0].msg,
+      oldInput: {
+        email: email,
+        password: password
+      },
+      validationErrors: errors.array()
+    });
+  }
+
   // find user with specific email
   User.findOne({ email: email })
     .then(user => {
       // if don't have user return error message
       if (!user) {
-        req.flash('error', 'Invalid email or password.');
-        return res.redirect('/login');
+         // return error status code
+        return res.status(422)
+        // return to login page and log any errors
+        .render('auth/login', {
+          path: '/login',
+          pageTitle: 'Login',
+          // return error message 
+          errorMessage: 'Invalid email or password',
+          // return old input
+          oldInput: {
+            email: email,
+            password: password
+          },
+          validationErrors: []
+        });
       }
       bcrypt
       // validate password
@@ -74,10 +120,22 @@ exports.postLogin = (req, res, next) => {
               res.redirect('/');
             });
           }
-          // if password is invalid
-          req.flash('error', 'Invalid email or password.');
-          res.redirect('/login');
-        })
+            // return error status code
+        return res.status(422)
+        // return to login page and log any errors
+        .render('auth/login', {
+          path: '/login',
+          pageTitle: 'Login',
+          // return error message 
+          errorMessage: 'Invalid email or password.',
+          // return old input
+          oldInput: {
+            email: email,
+            password: password
+          },
+          validationErrors: []
+        });
+      })
         .catch(err => {
           console.log(err);
           res.redirect('/login');
@@ -91,22 +149,28 @@ exports.postSignup = (req, res, next) => {
   const email = req.body.email;
   /* retireve password */
   const password = req.body.password;
-  /* retrieve confirmation password */
-  const confirmPassword = req.body.confirmPassword;
-  /* find a user that has the email we are extracting */
-  User.findOne({ email: email })
-    .then(userDoc => {
-      // if the user exists send error message
-      if (userDoc) {
-        req.flash(
-          'error',
-          'E-Mail exists already, please pick a different one.'
-        );
-        // redirect back to signup page
-        return res.redirect('/signup');
-      }
+  const errors = validationResult(req); // collect errors
+  // if there are errors
+  if (!errors.isEmpty()) {
+    console.log(errors.array());
+    // return error status code
+    return res.status(422)
+    // return to signup page and log any errors
+    .render('auth/signup', {
+      path: '/signup',
+      pageTitle: 'Signup',
+      errorMessage: errors.array()[0].msg,
+      oldInput: { 
+        email: email, 
+        password: password, 
+        confirmPassword: req.body.confirmPassword
+      },
+      validationErrors: errors.array()
+    });
+  }
+  
       // encrypt password to protect from hackers
-      return bcrypt
+      bcrypt
         .hash(password, 12)
         // get hashed password
         .then(hashedPassword => {
@@ -133,10 +197,6 @@ exports.postSignup = (req, res, next) => {
         .catch(err => {
           console.log(err);
         });
-    })
-    .catch(err => {
-      console.log(err);
-    });
 };
 
 exports.postLogout = (req, res, next) => {
