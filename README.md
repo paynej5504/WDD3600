@@ -30,7 +30,7 @@ data/
 ├─ cart.json
 ├─ products.json
 
-images/
+images/ (This is where uploaded images are stored)
 
 middleware/
 ├─ is-auth.js
