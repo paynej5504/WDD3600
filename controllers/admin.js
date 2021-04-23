@@ -2,6 +2,7 @@ const { validationResult } = require('express-validator/check');
 //const mongodb = require('mongodb'); //import mongo db
 const Product = require('../models/product');
 
+const mongoose = require('mongoose');
 //const ObjectId = mongodb.ObjectId;
 
 //admin functions
@@ -31,7 +32,7 @@ exports.getAddProduct = (req, res, next) => {
       // error status code
       return res.status(422).render('admin/edit-product', {
         pageTitle: 'Add Product',
-        path: '/admin/edit-product',
+        path: '/admin/add-product',
         editing: false,
         hasError: true,
         product: {
@@ -49,6 +50,7 @@ exports.getAddProduct = (req, res, next) => {
     //creates a new product based on the class
     //passes title, price, image, and description of product
     const product = new Product({
+    // _id: new mongoose.Types.ObjectId('6037f528894c6f4cdcf025dc'),
       title: title, 
       price: price, 
       description: description, 
@@ -63,7 +65,28 @@ exports.getAddProduct = (req, res, next) => {
       res.redirect('/admin/products');
     })
     .catch(err => {
-      console.log(err);
+
+      // server-side issue occurred if status code 500
+      // return res.status(500).render('admin/edit-product', {
+      //   pageTitle: 'Add Product',
+      //   path: '/admin/add-product',
+      //   editing: false,
+      //   hasError: true,
+      //   product: {
+      //     title: title,
+      //     imageUrl: imageUrl,
+      //     price: price,
+      //     description: description
+      //   },
+      //   // get error messages
+      //   errorMessage: 'Database operation failed, please try again.',
+      //   validationErrors: []
+      // });
+      //res.redirect('/500');
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      //skip other middleware if error
+      return next(error);
     });
     
   };
@@ -78,6 +101,7 @@ exports.getAddProduct = (req, res, next) => {
     Product.findById(prodId)
     //Product.findByPk(prodId)
     .then(product => {
+      // check for existance of product
       if (!product) {
         return res.redirect('/');
       }
@@ -91,7 +115,13 @@ exports.getAddProduct = (req, res, next) => {
         validationErrors: [] // no errors so empty array
       });
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+      //trigger status code and throw error
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      //skip other middleware if error
+      return next(error);
+    });
   };
 
   // //fetches info for the product and replaces it with new info
@@ -140,7 +170,13 @@ exports.getAddProduct = (req, res, next) => {
         });
       })
       
-      .catch(err => console.log(err));
+      .catch(err => {
+        //trigger status code and throw error
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      //skip other middleware if error
+      return next(error);
+      });
     }
 
     //get products
@@ -158,7 +194,13 @@ exports.getAddProduct = (req, res, next) => {
         path: '/admin/products'
       });
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+      //trigger status code and throw error
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    //skip other middleware if error
+    return next(error);
+    });
   };
 
   //delete product
@@ -171,7 +213,11 @@ exports.getAddProduct = (req, res, next) => {
       res.redirect('/admin/products');
     })
     .catch(err => {
-      console.log(err);
+      //trigger status code and throw error
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    //skip other middleware if error
+    return next(error);
     });
     
   };

@@ -16,7 +16,11 @@ exports.getProducts = (req, res, next) => {
     });
   })
   .catch(err => {
-    console.log(err);
+    //trigger status code and throw error
+  const error = new Error(err);
+  error.httpStatusCode = 500;
+  //skip other middleware if error
+  return next(error);
   });
 };
 
@@ -30,7 +34,13 @@ exports.getProduct = (req, res, next) => {
       pageTitle: product.title,
       path: '/products'
     }); 
-  }).catch(err => console.log(err));
+  }).catch(err => {
+    //trigger status code and throw error
+  const error = new Error(err);
+  error.httpStatusCode = 500;
+  //skip other middleware if error
+  return next(error);
+  });
 };
 
 exports.getIndex = (req, res, next) => {
@@ -44,7 +54,11 @@ exports.getIndex = (req, res, next) => {
     });
   })
   .catch(err => {
-    console.log(err);
+    //trigger status code and throw error
+  const error = new Error(err);
+  error.httpStatusCode = 500;
+  //skip other middleware if error
+  return next(error);
   });
 };
 
@@ -63,7 +77,13 @@ exports.getCart = (req, res, next) => {
         products: products
       });
     })
-  .catch(err => console.log(err))
+  .catch(err => {
+    //trigger status code and throw error
+  const error = new Error(err);
+  error.httpStatusCode = 500;
+  //skip other middleware if error
+  return next(error);
+  });
 };
 
 //add an element to the cart
@@ -89,7 +109,13 @@ exports.postCartDeleteProduct = (req, res, next) => {
   .then(result => {
     res.redirect('/cart');
   })
-  .catch(err => console.log(err));
+  .catch(err => {
+    //trigger status code and throw error
+  const error = new Error(err);
+  error.httpStatusCode = 500;
+  //skip other middleware if error
+  return next(error);
+  });
 };
 
 exports.postOrder = (req, res, next) => {
@@ -118,7 +144,13 @@ exports.postOrder = (req, res, next) => {
   .then(() => {
     res.redirect('/orders');
   })
-  .catch(err => console.log(err));
+  .catch(err => {
+    //trigger status code and throw error
+  const error = new Error(err);
+  error.httpStatusCode = 500;
+  //skip other middleware if error
+  return next(error);
+  });
 };
 
 //view for /orders url
@@ -131,5 +163,11 @@ exports.getOrders = (req, res, next) => {
       orders: orders
     });
   })
-  .catch(err => console.log(err));
+  .catch(err => {
+    //trigger status code and throw error
+  const error = new Error(err);
+  error.httpStatusCode = 500;
+  //skip other middleware if error
+  return next(error);
+  });
 };

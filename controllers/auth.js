@@ -141,7 +141,13 @@ exports.postLogin = (req, res, next) => {
           res.redirect('/login');
         });
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+      //trigger status code and throw error
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    //skip other middleware if error
+    return next(error);
+    });
 };
 
 exports.postSignup = (req, res, next) => {
@@ -195,7 +201,11 @@ exports.postSignup = (req, res, next) => {
           });
         })
         .catch(err => {
-          console.log(err);
+          //trigger status code and throw error
+        const error = new Error(err);
+        error.httpStatusCode = 500;
+        //skip other middleware if error
+        return next(error);
         });
 };
 
@@ -257,8 +267,12 @@ exports.postReset = (req, res, next) => {
       });
     })
     .catch(err => {
-      console.log(err);
-    })
+      //trigger status code and throw error
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    //skip other middleware if error
+    return next(error);
+    });
   });
 };
 
@@ -284,7 +298,11 @@ exports.getNewPassword = (req, res, next) => {
     });
   })
   .catch(err => {
-    console.log(err);
+    //trigger status code and throw error
+  const error = new Error(err);
+  error.httpStatusCode = 500;
+  //skip other middleware if error
+  return next(error);
   });
 
   
@@ -314,6 +332,10 @@ exports.postNewPassword = (req, res, next) => {
     res.redirect('/login');
   })
   .catch(err => {
-    console.log(err);
-  })
+    //trigger status code and throw error
+  const error = new Error(err);
+  error.httpStatusCode = 500;
+  //skip other middleware if error
+  return next(error);
+  });
 }

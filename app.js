@@ -53,6 +53,14 @@ app.use(session({
 app.use(csrfProtection);
 app.use(flash());
 
+// csrf token
+app.use((req, res, next) => {
+  // these fields are set for the views that are rendered
+  res.locals.isAuthenticated = req.session.isLoggedIn;
+  res.locals.csrfToken = req.csrfToken();
+  next();
+});
+
 // app.use ((req, res, next) => {
 //     User.findById()
 //     .then
@@ -64,18 +72,20 @@ app.use((req, res, next) => {
     //search for user with this id
     User.findById(req.session.user._id)
       .then(user => {
+        // check for existence of user
+        if (!user) {
+          return next();
+        }
         req.user = user;
         next();
       })
-      .catch(err => console.log(err));
+      .catch(err => {
+        // throw an error if there is an issue
+        next(new Error(err));
+      });
   });
 
-  app.use((req, res, next) => {
-    // these fields are set for the views that are rendered
-    res.locals.isAuthenticated = req.session.isLoggedIn;
-    res.locals.csrfToken = req.csrfToken();
-    next();
-  });
+  
 
 //places the router object 
 app.use('/admin',adminRoutes); //ADDED BY AH
@@ -88,8 +98,18 @@ app.use(authRoutes);
    //res.status(404).render('404', { pageTitle: 'Page Not Found' }); //COMMENTED OUT BY AH
 //});
 
+app.get('/500', errorController.get500);
 //references get404 function
 app.use(errorController.get404);
+
+// include error middleware
+app.use((error, req, res, next) => {
+  //res.redirect('/500');
+  res.status(500).render('500', { 
+    pageTitle: 'Error!', 
+    path:'/500',
+    isAuthenticated: req.session.isLoggedIn });
+});
 
 //connect via mongoose
 mongoose
