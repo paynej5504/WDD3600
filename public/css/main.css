@@ -1,9 +1,11 @@
+/* import font */
 @import url('https://fonts.googleapis.com/css?family=Open+Sans:400,700');
 
 * {
   box-sizing: border-box;
 }
 
+/* style body */
 body {
   padding: 0;
   margin: 0;
@@ -15,14 +17,17 @@ main {
   margin: auto;
 }
 
+/*style for forms */
 form {
   display: inline;
 }
 
+/*style for centered class */
 .centered {
   text-align: center;
 }
 
+/*style for images*/
 .image {
   height: 20rem;
 }
@@ -31,6 +36,7 @@ form {
   height: 100%;
 }
 
+/*style for header*/
 .main-header {
   width: 100%;
   height: 3.5rem;
@@ -40,6 +46,7 @@ form {
   align-items: center;
 }
 
+/*navigation style*/
 .main-header__nav {
   height: 100%;
   width: 100%;
@@ -48,6 +55,7 @@ form {
   justify-content: space-between;
 }
 
+/*header item styles*/
 .main-header__item-list {
   list-style: none;
   margin: 0;
@@ -70,6 +78,7 @@ form {
   cursor: pointer;
 }
 
+/*styles for when an item is active or hovered over*/
 .main-header__item a:hover,
 .main-header__item a:active,
 .main-header__item a.active,
@@ -78,6 +87,7 @@ form {
   color: rgb(37, 236, 186);
 }
 
+/*style for navigation when viewed on mobile device*/
 .mobile-nav {
   width: 30rem;
   height: 100vh;
@@ -92,10 +102,12 @@ form {
   transition: transform 0.3s ease-out;
 }
 
+/*to open navigation*/
 .mobile-nav.open {
   transform: translateX(0);
 }
 
+/*mobile navigation items*/
 .mobile-nav__item-list {
   list-style: none;
   display: flex;
@@ -121,6 +133,7 @@ form {
   cursor: pointer;
 }
 
+/*style for when active or hovered over on mobile navigation*/
 .mobile-nav__item a:active,
 .mobile-nav__item a:hover,
 .mobile-nav__item a.active,
@@ -131,6 +144,7 @@ form {
   border-radius: 3px;
 }
 
+/*side menu styles*/
 #side-menu-toggle {
   border: 1px solid white;
   font: inherit;
@@ -162,6 +176,7 @@ form {
   display: none;
 }
 
+/*grid styles*/
 .grid {
   display: flex;
   flex-wrap: wrap;
@@ -169,42 +184,53 @@ form {
   align-items: stretch;
 }
 
+/*card styles*/
 .card {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
   width: 30%;
   height: 30%;
 }
 
-.card__header,
-.card__content {
+/*card header and content padding*/
+.card_header,
+.card_content {
   padding: 1rem;
 }
 
-.card__header h1,
-.card__content h1,
-.card__content h2,
-.card__content p {
+/*card header and paragraph styles*/
+.card_header h1,
+.card_content h1,
+.card_content h2,
+.card_content p {
   margin: 0;
 }
 
-.card__image {
+/* center image in card */
+.card_image {
+  /*width: 100%;*/
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+}
+
+/*set image width to 100%*/
+.card_image img {
   width: 100%;
 }
 
-.card__image img {
-  width: 100%;
-}
-
-.card__actions {
+.card_actions {
   padding: 1rem;
   text-align: center;
 }
 
-.card__actions button,
-.card__actions a {
+/*card link and button styles*/
+.card_actions button,
+.card_actions a {
   margin: 0 0.25rem;
 }
 
+/*button styles*/
 .btn {
   display: inline-block;
   padding: 0.25rem 1rem;
@@ -217,17 +243,14 @@ form {
   cursor: pointer;
 }
 
+/*style when a button is active or hovered over*/
 .btn:hover,
 .btn:active {
   background-color: #00695c;
   color: white;
 }
 
-img {
-  height: 100%;
-  width: 100%;
-}
-
+/*button danger styles*/
 .btn.danger {
   color: red;
   border-color: red;
@@ -239,6 +262,7 @@ img {
   color: white;
 }
 
+/*styles for user messages*/
 .user-message {
   margin: auto;
   width: 90%;
@@ -249,12 +273,37 @@ img {
   text-align: center;
 }
 
+/*error message styles*/
 .user-message--error {
   border-color: red;
   background: rgb(255, 176, 176);
   color: red;
 }
 
+/*pagination styles*/
+.pagination {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+/* style links */
+.pagination a {
+  text-decoration: none;
+  color: #00695c;
+  padding: 0.5rem;
+  border: 1px solid #00695c;
+  margin: 0 1rem;
+}
+
+/* add hover and active effects */
+.pagination a:hover,
+.pagination a:active,
+.pagination a.active {
+  background: #00695c;
+  color: white;
+}
+
+/*mobile styles for user messages*/
 @media (min-width: 768px) {
   .main-header__nav {
     display: flex;

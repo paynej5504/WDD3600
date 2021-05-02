@@ -1,29 +1,33 @@
 <%- include('../includes/head.ejs') %>
-    
+    <!--load css-->
     <link rel="stylesheet" href="/css/product.css">
    
 </head>
 <body>
+    <!--navigation-->
     <%- include('../includes/navigation.ejs') %>
+    <main>
+        <!--display products-->
         <% if (prods.length > 0) { %>
-        <!--<h1>My Products</h1>
-        <p>List of products...</p>-->
         <div class="grid">
             <% for (let product of prods) { %>
                 <article class="card product-items">
                     <header class="card_header">
+                        <!--product title-->
                         <h1 class="product_title"><%= product.title %></h1>
                     </header>
+                    <!--product image-->
                     <div class="card_image">
-                        <!--<img src="../img/book.jpg"/>-->
-                        <img src="<%= product.imageUrl %>" alt="<%= product.title %>">
+                        <img src="/<%= product.imageUrl %>" alt="<%= product.title %>">
                     </div>
+                    <!--product price and descrition-->
                     <div class="card_content">
                         <h2 class="product_price">$<%= product.price %></h2>
                         <p class="product_description"><%= product.description %></p>
                     </div>
                     <div class="card_actions">
                         <a href="/products/<%= product._id %>" class="btn">Details</a>
+                        <!--if logged in include add to cart-->
                         <% if (isAuthenticated) { %>
                             <%- include('../includes/add-to-cart.ejs', {product: product}) %>
                         <% } %>
@@ -31,7 +35,10 @@
                 </article>
                 <% } %>
         </div>
+        <!-- include pagnation -->
+        <%- include('../includes/pagination.ejs', {currentPage: currentPage, nextPage: nextPage, previousPage: previousPage, lastPage: lastPage, hasNextPage: hasNextPage, hasPreviousPage: hasPreviousPage}) %>
         <% } else { %>
+            <!--if there are no products-->
             <h1>No Products Found</h1>
         <% } %>    
     </main>

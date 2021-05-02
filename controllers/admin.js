@@ -1,14 +1,15 @@
+//import statements
 const { validationResult } = require('express-validator/check');
-//const mongodb = require('mongodb'); //import mongo db
 const Product = require('../models/product');
 
 const mongoose = require('mongoose');
-//const ObjectId = mongodb.ObjectId;
+
+const fileHelper = require('../util/file');
+const product = require('../models/product');
 
 //admin functions
 //exported function
 exports.getAddProduct = (req, res, next) => {
-
     // if user is logged in show page
     res.render('admin/edit-product', {
       pageTitle: 'Add Product',
@@ -22,12 +23,32 @@ exports.getAddProduct = (req, res, next) => {
   
   //adds new product through post route
   exports.postAddProduct = (req, res, next) => {
+    //get product information
     const title = req.body.title;  
-    const imageUrl = req.body.imageUrl;
+    const image = req.file;
     const price = req.body.price;
     const description = req.body.description;
+    // check if image is set
+    if (!image) {
+      // return error if data is not defined
+      return res.status(422).render('admin/edit-product', {
+        pageTitle: 'Add Product',
+        path: '/admin/add-product',
+        editing: false,
+        hasError: true,
+        product: {
+          title: title,
+          price: price,
+          description: description
+        },
+        // error if file is not an image file
+        errorMessage: 'Attached file is not an image.',
+        validationErrors: []
+      });
+    }
     const errors = validationResult(req);
 
+    //if there is an error
     if (!errors.isEmpty()) {
       // error status code
       return res.status(422).render('admin/edit-product', {
@@ -47,48 +68,30 @@ exports.getAddProduct = (req, res, next) => {
       });
     }
     
+    const imageUrl = image.path;
+
     //creates a new product based on the class
     //passes title, price, image, and description of product
     const product = new Product({
-    // _id: new mongoose.Types.ObjectId('6037f528894c6f4cdcf025dc'),
       title: title, 
       price: price, 
       description: description, 
       imageUrl: imageUrl,
       userId: req.user
     });
+    //save product information and redirect
     product
     .save()
     .then(result => {
-      //console.log(result);
       console.log('created product');
       res.redirect('/admin/products');
     })
     .catch(err => {
-
-      // server-side issue occurred if status code 500
-      // return res.status(500).render('admin/edit-product', {
-      //   pageTitle: 'Add Product',
-      //   path: '/admin/add-product',
-      //   editing: false,
-      //   hasError: true,
-      //   product: {
-      //     title: title,
-      //     imageUrl: imageUrl,
-      //     price: price,
-      //     description: description
-      //   },
-      //   // get error messages
-      //   errorMessage: 'Database operation failed, please try again.',
-      //   validationErrors: []
-      // });
-      //res.redirect('/500');
       const error = new Error(err);
       error.httpStatusCode = 500;
       //skip other middleware if error
       return next(error);
     });
-    
   };
 
   exports.getEditProduct = (req, res, next) => {
@@ -99,7 +102,6 @@ exports.getAddProduct = (req, res, next) => {
     }
     const prodId = req.params.productId;
     Product.findById(prodId)
-    //Product.findByPk(prodId)
     .then(product => {
       // check for existance of product
       if (!product) {
@@ -129,7 +131,7 @@ exports.getAddProduct = (req, res, next) => {
     const prodId = req.body.productId;
     const updatedTitle = req.body.title;
     const updatedPrice = req.body.price;
-    const updatedImageUrl = req.body.imageUrl;
+    const image = req.file;
     const updatedDescription = req.body.description;
     const errors = validationResult(req);
 
@@ -143,7 +145,6 @@ exports.getAddProduct = (req, res, next) => {
         // product data values
         product: {
           title: updatedTitle,
-          imageUrl: updatedImageUrl,
           price: updatedPrice,
           description: updatedDescription,
           _id: prodId
@@ -163,7 +164,12 @@ exports.getAddProduct = (req, res, next) => {
         product.title = updatedTitle;
         product.price = updatedPrice;
         product.description = updatedDescription;
-        product.imageUrl = updatedImageUrl;
+        if (image) {
+          // delete image if new image is added
+          fileHelper.deleteFile(product.imageUrl);
+          product.imageUrl = image.path;
+        }
+        
         return product.save().then(result => {
           console.log('UPDATED PRODUCT');
           res.redirect('/admin/products');
@@ -183,10 +189,6 @@ exports.getAddProduct = (req, res, next) => {
   exports.getProducts = (req, res, next) => {
     // only products created by user will be retrieved
     Product.find({userId: req.user._id})
-    // //which fields you want to select or unselect
-    // .select('title price -_id')
-    // //tells mongoose to populate a certain field with info
-    // .populate('userId', 'name')
     .then(products => {
       res.render('admin/products', {
         prods: products,
@@ -204,20 +206,27 @@ exports.getAddProduct = (req, res, next) => {
   };
 
   //delete product
-  exports.postDeleteProduct = (req, res, next) => {
-    const prodId = req.body.productId;
-    Product.deleteOne({_id: prodId, userId: req.user._id})
+  exports.deleteProduct = (req, res, next) => {
+    //get product that matches the id
+    const prodId = req.params.productId;
+    Product.findById(prodId)
+    .then(product => {
+      //if product is not found throw error message
+      if (!product) {
+        return next(new Error('Product not found.'));
+      }
+      //delete file
+      fileHelper.deleteFile(product.imageUrl);
+      return Product.deleteOne({_id: prodId, userId: req.user._id});
+    })
     .then(() => {
       console.log('DESTROYED PRODUCT');
-      //redirect to products page once product is deleted
-      res.redirect('/admin/products');
+      //success message if product was deleted
+      res.status(200).json({message: 'Success!'});
     })
+    //error message is product deletion failed
     .catch(err => {
-      //trigger status code and throw error
-    const error = new Error(err);
-    error.httpStatusCode = 500;
-    //skip other middleware if error
-    return next(error);
+      res.status(500).json({message: 'Deleting product failed.'});
     });
     
   };

@@ -1,13 +1,15 @@
 <%- include('../includes/head.ejs') %>
+<!--load css-->
     <link rel="stylesheet" href="/css/forms.css">
     <link rel="stylesheet" href="/css/auth.css">
 </head>
 
 <body>
+    <!--navigation-->
    <%- include('../includes/navigation.ejs') %>
 
     <main>
-        
+        <!--error message is there is one-->
         <% if (errorMessage) { %>
             <!--output error message-->
             <div class="user-message user-message--error"><%= errorMessage %></div>
@@ -50,4 +52,5 @@
             <button class="btn" type="submit">Signup</button>
         </form>
     </main>
+    <!--footer-->
 <%- include('../includes/end.ejs') %>

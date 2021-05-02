@@ -1,21 +1,27 @@
 <%- include('../includes/head.ejs') %>
-    
+    <!--load css-->
     <link rel="stylesheet" href="/css/product.css">
    
 </head>
 
 <body>
+    <!--navigation-->
     <%- include('../includes/navigation.ejs') %>
     <main class="centered">
+        <!--show product title-->
         <h1><%= product.title %></h1>
         <hr>
+        <!--show product image-->
         <div>
-            <img src="<%= product.imageUrl %>" alt="<%= product.title %>">
+            <img src="/<%= product.imageUrl %>" alt="<%= product.title %>">
         </div>
+        <!--show product price-->
         <h2><%= product.price %></h2>
+        <!--show product description-->
         <p><%= product.description %></p>
+        <!--include only if logged in-->
         <% if (isAuthenticated) { %>
             <%- include('../includes/add-to-cart.ejs') %>
         <% } %>    
-        </main>
+    </main>
     <%- include('../includes/end.ejs') %>

@@ -1,19 +1,22 @@
 <%- include('../includes/head.ejs') %>
-    
+    <!--load css-->
     <link rel="stylesheet" href="/css/cart.css">
    
 </head>
 
 <body>
+    <!--navigation-->
     <%- include('../includes/navigation.ejs') %>
     <main>
+        <!--show products in cart-->
         <% if (products.length > 0) { %>
             <ul class="cart__item-list">
                 <% products.forEach(p => { %>
                     <li class="cart__item">
                         <h1><%= p.productId.title %></h1>
                         <h2>Quantity: <%= p.quantity %></h2>
-                        
+
+                        <!--delete item from cart-->
                         <form action="/cart-delete-item" method="POST">
                             <input type="hidden" value="<%= p.productId._id %>" name="productId">
                             <input type="hidden" name="_csrf" value="<%= csrfToken %>">
@@ -24,12 +27,11 @@
             </ul>
             <hr>
             <div class="centered">
-                <form action="/create-order" method="POST">
-                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                    <button type="submit" class="btn">Order Now!</button>
-                </form>
+                <!-- order button that leads to checkout route -->
+                <a class="btn" href="/checkout">Order Now!</a>
             </div>
         <% } else { %>
+            <!--show if cart is empty-->
             <h1>No Products in Cart</h1>
         <% } %>
     </main>

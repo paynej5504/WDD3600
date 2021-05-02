@@ -1,19 +1,25 @@
 <%- include('../includes/head.ejs') %>
+<!--link style sheets-->
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/product.css">
     <link rel="stylesheet" href="/css/forms.css">
 </head>
 <body>
+    <!--navigation.ejs-->
     <%- include('../includes/navigation.ejs') %>
 
 
     <main>
+        <!--error message displays here if there is one-->
         <% if (errorMessage) { %>
             <div class="user-message user-message--error"><%= errorMessage %></div>
         <% } %>
-        <form class="product-form" action="/admin/<% if (editing) { %>edit-product<% } else { %>add-product<% } %>" method="POST">
+        <!--product form-->
+        <form class="product-form" action="/admin/<% if (editing) { %>edit-product<% } else { %>add-product<% } %>" method="POST" enctype="multipart/form-data">
             <div class="form-control">
+                <!--product title field-->
                 <label for="title">Title</label>
+                <!--gets product title-->
                 <input 
                 class="<%= validationErrors.find(e => e.param === 'title') ? 'invalid' : '' %>"
                     type="text" 
@@ -21,17 +27,19 @@
                     id="title" 
                     value="<% if (editing || hasError) { %><%= product.title %><% } %>">
             </div>
+            <!--image-->
             <div class="form-control">
-                <label for="imageUrl">Image URL</label>
-                <input 
-                class="<%= validationErrors.find(e => e.param === 'imageUrl') ? 'invalid' : '' %>"
-                    type="text" 
-                    name="imageUrl" 
-                    id="imageUrl" 
-                    value="<% if (editing || hasError) { %><%= product.imageUrl %><% } %>">
+                <label for="image">Image</label>
+                <!--uses default HTML file picker-->
+                <input
+                    type="file" 
+                    name="image" 
+                    id="image" >
             </div>
             <div class="form-control">
+                <!--product price field-->
                 <label for="price">Price</label>
+                <!--gets product price-->
                 <input 
                 class="<%= validationErrors.find(e => e.param === 'price') ? 'invalid' : '' %>"
                     type="number" 
@@ -40,8 +48,10 @@
                     step="0.01" 
                     value="<% if (editing || hasError) { %><%= product.price %><% } %>">
             </div>
+            <!--product descrition field-->
             <div class="form-control">
                 <label for="description">Description</label>
+                <!--gets product description-->
                 <textarea 
                     class="<%= validationErrors.find(e => e.param === 'description') ? 'invalid' : '' %>"
                     type="text" 
@@ -54,7 +64,9 @@
             <% } %>
 
             <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <!--submit button-->
             <button class="btn" type="submit"><% if (editing) { %>Update Product<% } else { %>Add Product<% } %></button>
         </form>
     </main>
+    <!--footer ejs-->
     <%- include ('../includes/end.ejs') %>

@@ -1,5 +1,7 @@
+//import statements
 const mongoose = require('mongoose');
 
+//create new schema
 const Schema = mongoose.Schema;
 
 //store data in order collection

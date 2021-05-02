@@ -14,7 +14,7 @@ const transporter = nodemailer.createTransport(
     auth: {
       // key from sendgrid
       api_key:
-        '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'
+        '//sendgrid api key goes here'
     }
   })
 );
@@ -27,6 +27,7 @@ exports.getLogin = (req, res, next) => {
   } else {
     message = null;
   }
+  //render login page
   res.render('auth/login', {
     path: '/login',
     pageTitle: 'Login',
@@ -195,7 +196,7 @@ exports.postSignup = (req, res, next) => {
           return transporter.sendMail({
             // configure email you want to send
             to: email,
-            from: 'paynej5504@clarkstate.edu',
+            from: '', //enter your email address in ''
             subject: 'Signup succeeded!',
             html: '<h1>You successfully signed up!</h1>'
           });
@@ -258,7 +259,7 @@ exports.postReset = (req, res, next) => {
       transporter.sendMail({
         // configure email you want to send
         to: req.body.email,
-        from: 'paynej5504@clarkstate.edu',
+        from: '', //enter sender email address in ''
         subject: 'Password reset',
         html: `
           <p>You requested a password reset</p>
@@ -309,6 +310,7 @@ exports.getNewPassword = (req, res, next) => {
 }
 
 exports.postNewPassword = (req, res, next) => {
+  //get user details
   const newPassword = req.body.password;
   const userId = req.body.userId;
   const passwordToken = req.body.passwordToken;
@@ -326,6 +328,7 @@ exports.postNewPassword = (req, res, next) => {
     resetUser.password = hashedPassword;
     resetUser.resetToken = undefined;
     resetUser.resetTokenExpiration = undefined;
+    //save user information
     return resetUser.save();
   })
   .then(result => {

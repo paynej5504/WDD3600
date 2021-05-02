@@ -19,9 +19,15 @@ router.post('/cart', isAuth, shopController.postCart);
 
 router.post('/cart-delete-item', isAuth, shopController.postCartDeleteProduct);
 
-router.post('/create-order', isAuth, shopController.postOrder);
+// checkout route
+router.get('/checkout', isAuth, shopController.getCheckout);
+
+// create order route
+
 
 router.get('/orders', isAuth, shopController.getOrders);
+
+router.get('/orders/:orderId', isAuth, shopController.getInvoice);
 
 
 //router gets exported

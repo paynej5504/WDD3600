@@ -28,8 +28,6 @@ const router = express.Router();
         .isLength({ min: 3 })
         // trim extra whitespace
         .trim(),
-    body ('imageUrl')
-        .isURL(), // check if valid URL
     body ('price')
         .isFloat(),
     body ('description')
@@ -52,8 +50,6 @@ router.post('/edit-product', [
             .isLength({ min: 3 })
             // trim extra whitespace
             .trim(),
-        body ('imageUrl')
-            .isURL(), // check if valid URL
         body ('price')
             .isFloat(),
         body ('description')
@@ -66,7 +62,8 @@ router.post('/edit-product', [
     adminController.postEditProduct
 );
 
-router.post('/delete-product', isAuth, adminController.postDeleteProduct);
+// delete route to delete product
+router.delete('/product/:productId', isAuth, adminController.deleteProduct);
 
 // exports router
 module.exports = router;

@@ -1,9 +1,6 @@
 
-//import path
+//import statements
 const path = require('path');
-
-// This is an example of how to create a node server
-//const http = require('http');
 
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -12,13 +9,18 @@ const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 const csrf = require('csurf');
 const flash = require('connect-flash');
+const multer = require('multer');
 
 //imports error.js from controllers folder
 const errorController = require('./controllers/error');
+//import products.js from controllers folder
+const shopController = require('./controllers/shop');
+const isAuth = require('./middleware/is-auth');
 
 const User = require('./models/user');
 
-const MONGODB_URI = 'mongodb+srv://Jeris:meeko05@cluster0.riltt.mongodb.net/shop?retryWrites=true&w=majority';
+//enter MongoDb connection string in ''
+const MONGODB_URI = '';
 
 /*imports modules */
 const app = express();
@@ -28,6 +30,32 @@ const store = new MongoDBStore({
 });
 // initialize csurf
 const csrfProtection = csrf();
+
+// control path and filename
+const fileStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'images');
+  },
+  // rename file 
+  filename: (req, file, cb) => {
+    cb(null, new Date().toISOString().replace(/:/g,'-') + '-' + file.originalname);
+  }
+});
+
+const fileFilter = (req, file, cb) => {
+  //image files that are accepted
+  if (
+    file.mimetype === 'image/png' || 
+    file.mimetype === 'image/jpg' || 
+    file.mimetype === 'image/jpeg'
+  ) {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+   
+};
+
 
 app.set('view engine', 'ejs');
 app.set('views', 'views');
@@ -40,8 +68,11 @@ const shopRoutes = require('./routes/shop');
 
 //calls bodyParser to parse the body that's sent through the form
 app.use(bodyParser.urlencoded({extended: false}));
+app.use(multer({storage: fileStorage, fileFilter: fileFilter}).single('image')); //use multer and set imput name that will hold file
 //static method serves static files. In this case it's used to access the css file
-app.use(express.static(path.join(__dirname, 'public', )));
+app.use(express.static(path.join(__dirname, 'public' )));
+// go to /images then serve th efiles staticly
+app.use('/images', express.static(path.join(__dirname, 'images' )));
 //session middleware is initialized
 app.use(session({
   secret: 'my secret', 
@@ -50,21 +81,15 @@ app.use(session({
   store: store
   })
 );
-app.use(csrfProtection);
 app.use(flash());
 
 // csrf token
 app.use((req, res, next) => {
   // these fields are set for the views that are rendered
   res.locals.isAuthenticated = req.session.isLoggedIn;
-  res.locals.csrfToken = req.csrfToken();
   next();
 });
 
-// app.use ((req, res, next) => {
-//     User.findById()
-//     .then
-// });
 app.use((req, res, next) => {
     if (!req.session.user) {
       return next();
@@ -85,18 +110,22 @@ app.use((req, res, next) => {
       });
   });
 
-  
+app.post('/create-order', isAuth, shopController.postOrder);
+
+// initialize csrf middleware
+app.use(csrfProtection);
+app.use((req, res, next) => {
+  // these fields are set for the views that are rendered
+  res.locals.isAuthenticated = req.session.isLoggedIn;
+  res.locals.csrfToken = req.csrfToken();
+  next();
+});
 
 //places the router object 
 app.use('/admin',adminRoutes); //ADDED BY AH
 app.use(shopRoutes);
 app.use(authRoutes);
 
-//middleware to handle 404
-//app.use((req, res, next) => { //COMMENTED OUT BY AH
-    //uses join method to connect to 404.html page 
-   //res.status(404).render('404', { pageTitle: 'Page Not Found' }); //COMMENTED OUT BY AH
-//});
 
 app.get('/500', errorController.get500);
 //references get404 function
@@ -104,19 +133,19 @@ app.use(errorController.get404);
 
 // include error middleware
 app.use((error, req, res, next) => {
-  //res.redirect('/500');
   res.status(500).render('500', { 
     pageTitle: 'Error!', 
     path:'/500',
     isAuthenticated: req.session.isLoggedIn });
 });
 
-//connect via mongoose
+//connect to database via mongoose
 mongoose
   .connect(
     MONGODB_URI  
   )
 .then(result =>{
+  //open on port 3000
   app.listen(3000);
 })
 .catch(err => {
